@@ -3,7 +3,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 import json
-import pymysql
 import streamlit as st
 
 #this is a phonepe pulsedata
