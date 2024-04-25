@@ -1,0 +1,25 @@
+{
+    "snowflake.snowsqlConfigPath": "eqcptkk.vw73578",
+    "sqltools.connections": [
+        {
+            "authenticator": "SNOWFLAKE",
+            "ocspOptions": {
+                "ocspFailOpen": true
+            },
+            "snowflakeOptions": {
+                "clientSessionKeepAlive": true,
+                "clientSessionKeepAliveHeartbeatFrequency": 3600,
+                "schema": "PUBLIC",
+                "role": "ACCOUNTADMIN"
+            },
+            "previewLimit": 50,
+            "driver": "Snowflake",
+            "name": "Snowflake",
+            "account": "eqcptkk-vw73578",
+            "username": "Shanth",
+            "password": "Shashi@007",
+            "database": "PRACTICE",
+            "warehouse": "COMPUTE_WH"
+        }
+    ]
+}
