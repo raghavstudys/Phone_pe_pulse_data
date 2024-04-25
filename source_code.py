@@ -6,6 +6,7 @@ import json
 import streamlit as st
 import snowflake.connector
 from snowflake.connector.pandas_tools import write_pandas
+from snowflake.connector import connect,DictCursor
 
 #to make a connection with snowflake
 my_connection = snowflake.connector.connect(user="SHANTH",
@@ -16,7 +17,7 @@ my_connection = snowflake.connector.connect(user="SHANTH",
                  schema = "PUBLIC",
                  role = "ACCOUNTADMIN" )
 
-curr = my_connection.cursor()
+curr = my_connection.cursor(DictCursor)
 
 
 #this is a phonepe pulsedata
@@ -66,7 +67,9 @@ FROM
     AGG_TRANSACTION_INDIA
 GROUP BY 1
 ORDER BY 2 DESC;'''
-dff = curr.execute(query)
+curr.execute(query)
+dff1 = curr.fetchall()
+dff = pd.DataFrame(dff1)
 
 st.dataframe(dff)
 
