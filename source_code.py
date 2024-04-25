@@ -7,6 +7,17 @@ import streamlit as st
 import snowflake.connector
 from snowflake.connector.pandas_tools import write_pandas
 
+#to make a connection with snowflake
+my_connection = snowflake.connector.connect(user="SHANTH",
+                 password = "Shashi@007",
+                 account = "eqcptkk-vw73578",
+                 warehouse = "COMPUTE_WH",
+                 database = "PRACTICE",
+                 schema = "PUBLIC",
+                 role = "ACCOUNTADMIN" )
+
+curr = my_connection.cursor()
+
 
 #this is a phonepe pulsedata
 
@@ -46,4 +57,16 @@ st.header("PHONE_PE PULSE")
 # df = pd.DataFrame(agg_city_data)
 # st.dataframe(df, use_container_width=True)
 
+# To retrive data
+
+query = '''SELECT
+    STATE,
+    SUM(AMOUNT) AS TOTAL_TRANSACTION
+FROM    
+    AGG_TRANSACTION_INDIA
+GROUP BY 1
+ORDER BY 2 DESC;'''
+dff = curr.execute(query)
+
+st.dataframe(dff)
 
