@@ -42,3 +42,5 @@ for i in city_agg_list:
 
 df = pd.DataFrame(agg_city_data)
 st.dataframe(df, use_container_width=True)
+
+
