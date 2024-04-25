@@ -72,4 +72,4 @@ dff1 = curr.fetchall()
 dff = pd.DataFrame(dff1)
 
 st.dataframe(dff)
-st.line_chart(data = dff,x = dff['STATE'],y=dff["TOTAL_TRANSACTION"])
+st.line_chart(data = dff,x = dff[['STATE']],y=dff[["TOTAL_TRANSACTION"]])
