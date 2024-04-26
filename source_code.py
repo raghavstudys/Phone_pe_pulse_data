@@ -8,20 +8,20 @@ import snowflake.connector
 from snowflake.connector.pandas_tools import write_pandas
 from snowflake.connector import connect,DictCursor
 
-#to make a connection with snowflake
-my_connection = snowflake.connector.connect(user="SHANTH",
-                 password = "Shashi@007",
-                 account = "eqcptkk-vw73578",
-                 warehouse = "COMPUTE_WH",
-                 database = "PRACTICE",
-                 schema = "PUBLIC",
-                 role = "ACCOUNTADMIN" )
+# #to make a connection with snowflake
+# my_connection = snowflake.connector.connect(user="SHANTH",
+#                  password = "Shashi@007",
+#                  account = "eqcptkk-vw73578",
+#                  warehouse = "COMPUTE_WH",
+#                  database = "PRACTICE",
+#                  schema = "PUBLIC",
+#                  role = "ACCOUNTADMIN" )
 
-curr = my_connection.cursor(DictCursor)
+# curr = my_connection.cursor(DictCursor)
 
-#this is a phonepe pulsedata
+# #this is a phonepe pulsedata
 
-st.header("PHONE_PE PULSE")
+# st.header("PHONE_PE PULSE")
 
 
 
@@ -113,7 +113,7 @@ for state_link in state_list_1:
 
 USERS_AGG_STATE_WISE = pd.DataFrame(users_agg_statewise)
 
-write_pandas(my_connection,USERS_AGG_STATE_WISE,table_name = 'USERS_AGG_STATE_WISE')
+# write_pandas(my_connection,USERS_AGG_STATE_WISE,table_name = 'USERS_AGG_STATE_WISE')
 
 path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//map//transaction//hover//country//india//state//"
 
@@ -156,3 +156,120 @@ for states in state_list:
 
 MAP_TRANSACTION_LIST = pd.DataFrame(map_transaction_list)
 
+
+#map_users
+
+MAP_USERS_DATA = {'STATE':[],'YEAR':[],'QUATER':[],'DISTRICT':[],'REGISTERED_USERS':[],'APP_OPENS':[]}
+
+path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//map//user//hover//country//india//state//"
+
+state_list = os.listdir(path)
+
+for states in state_list:
+    w_state_path = path+states+"//"
+    year_list = os.listdir(w_state_path)
+    
+    for years in year_list:
+        w_year_path = w_state_path+years+"//"
+        
+        files_list = os.listdir(w_year_path)
+        
+        for files in files_list:
+            w_files_path = w_year_path+files
+            
+            data = open(w_files_path,'r')
+            
+            final_files = json.load(data)
+            
+            for district in final_files['data']['hoverData']:
+                districts = district
+                registered_users = final_files['data']['hoverData'][district]['registeredUsers']
+                app_opens = final_files['data']['hoverData'][district]['appOpens']
+
+                MAP_USERS_DATA['STATE'].append(states)
+                MAP_USERS_DATA['YEAR'].append(years)
+                MAP_USERS_DATA['QUATER'].append(files.split('.json')[0])
+                MAP_USERS_DATA['DISTRICT'].append(districts)
+                MAP_USERS_DATA['REGISTERED_USERS'].append(registered_users)
+                MAP_USERS_DATA['APP_OPENS'].append(app_opens)
+
+MAP_USERS_DATA = pd.DataFrame(MAP_USERS_DATA)
+
+#top file _items
+
+TOP_TRANSACTION_LIST = {'STATE':[],'YEAR_':[],'QUATERS':[],'DISTRICT':[],'TYPE':[],'COUNT_':[],'AMOUNT':[]}
+
+path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//top//transaction//country//india//state//"
+state_list = os.listdir(path)
+
+for states in state_list:
+    w_state_path = path+states+"//"
+    
+    year_list = os.listdir(w_state_path)
+    
+    for years in year_list:
+        w_year_path = w_state_path+years+"//"
+        
+        files_list = os.listdir(w_year_path)
+        
+        for files in files_list:
+            w_files_path = w_year_path+files
+            
+            data = open(w_files_path,'r')
+            
+            final_data = json.load(data)
+            
+            state = states
+            year_ = years
+            quaters = files.split('.json')[0]
+            district_name = final_data['data']['districts'][0]['entityName']
+            type_ = final_data['data']['districts'][0]['metric']['type']
+            count_ = final_data['data']['districts'][0]['metric']['count']
+            amount = final_data['data']['districts'][0]['metric']['amount']
+            
+            TOP_TRANSACTION_LIST['STATE'].append(state)
+            TOP_TRANSACTION_LIST['YEAR_'].append(year_)
+            TOP_TRANSACTION_LIST['QUATERS'].append(quaters)
+            TOP_TRANSACTION_LIST['DISTRICT'].append(district_name)
+            TOP_TRANSACTION_LIST['TYPE'].append(type_)
+            TOP_TRANSACTION_LIST['COUNT_'].append(count_)
+            TOP_TRANSACTION_LIST['AMOUNT'].append(amount)
+
+TOP_TRANSACTION_LIST = pd.DataFrame(TOP_TRANSACTION_LIST)
+
+#top users list
+
+TOP_USERS_LIST = {'STATE':[],'YEAR_':[],'QUATERS_':[],'DISTRICT':[],'REGISTERED_USERS':[]}
+path = 'C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//top//user//country//india//state//'
+states = os.listdir(path)
+
+for state in states:
+    w_state_path = path+state+"//"
+    
+    year_list = os.listdir(w_state_path)
+    
+    for years in year_list:
+        w_year_path = w_state_path+years+"//"
+        
+        files_list = os.listdir(w_year_path)
+        
+        for files in files_list:
+            final_path = w_year_path+files
+            
+            DATA = open(final_path,'r')
+            
+            final_items  = json.load(DATA)
+            
+            names = final_items['data']['districts'][0]['name']
+            registered_users = final_items['data']['districts'][0]['registeredUsers']
+            states = state 
+            years_ = years
+            quaters  = files.split('.json')[0]
+            
+            TOP_USERS_LIST['STATE'].append(states)
+            TOP_USERS_LIST['YEAR_'].append(years_)
+            TOP_USERS_LIST['QUATERS_'].append(quaters)
+            TOP_USERS_LIST['DISTRICT'].append(names)
+            TOP_USERS_LIST['REGISTERED_USERS'].append(registered_users)
+
+TOP_USERS_LIST = pd.DataFrame(TOP_USERS_LIST)
