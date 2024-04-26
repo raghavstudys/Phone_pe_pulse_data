@@ -3,26 +3,17 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 import json
-import streamlit as st
-import snowflake.connector
+import snowflake.connector 
 from snowflake.connector.pandas_tools import write_pandas
 from snowflake.connector import connect,DictCursor
 
-# #to make a connection with snowflake
-# my_connection = snowflake.connector.connect(user="SHANTH",
-#                  password = "Shashi@007",
-#                  account = "eqcptkk-vw73578",
-#                  warehouse = "COMPUTE_WH",
-#                  database = "PRACTICE",
-#                  schema = "PUBLIC",
-#                  role = "ACCOUNTADMIN" )
-
-# curr = my_connection.cursor(DictCursor)
-
-# #this is a phonepe pulsedata
-
-# st.header("PHONE_PE PULSE")
-
+# my_connection = snowflake.connector.connect(user = 'SHANTH',
+#                                            password = 'Shashi@007',
+#                                            account = 'ad38571.central-india.azure',
+#                                            warehouse = 'COMPUTE_WH',
+#                                            database = 'PHONEPE_PULSE',
+#                                            schema = 'PUBLIC',
+#                                            role = 'ACCOUNTADMIN')
 
 
 #agg_transaction_india_state_wise
@@ -34,18 +25,19 @@ city_agg_list = os.listdir(path)
 agg_city_data = {'STATE':[], 'YEAR':[],'QUATER':[],'NAME':[], 'COUNT':[], 'AMOUNT':[]}
 for i in city_agg_list:
     city_link = path+i+'//'
-    year_agg_list = os.listdir(city_link)
-    for j in year_agg_list:
-        file_year_list = city_link+j+'//'
+    year_agg_list_1 = os.listdir(city_link)
+    for j in year_agg_list_1:
+        file_year_list_1 = city_link+j+'//'
 #         for k in file_year_list:
-        json_agg_list = os.listdir(file_year_list)
-        for l in json_agg_list:
-            final = file_year_list+l
+        json_agg_list_users = os.listdir(file_year_list_1)
+        for l in json_agg_list_users:
+            final = file_year_list_1+l
             data = open(final,'r')
 
             file_opener = json.load(data)
 
             for list_ in file_opener['data']['transactionData']:
+                
                 name_ = list_['name']
                 count_ = list_['paymentInstruments'][0]['count']
                 amount_ = list_['paymentInstruments'][0]['amount']
@@ -56,9 +48,6 @@ for i in city_agg_list:
                 agg_city_data['YEAR'].append(j)
                 agg_city_data['QUATER'].append(l.split('.')[0])
 
-TRANSACTION_AGG_CITY_DATA = pd.DataFrame(agg_city_data)
-
-# write_pandas(my_connection,TRANSACTION_AGG_CITY_DATA,table_name = 'TRANSACTION_AGG_CITY_DATA')
 
 #Extracting users_agg_statewise 
 users_agg_statewise = {'STATE':[], 'YEAR':[],'QUATER':[],'REGISTEREDUSERS':[],'APPOPENS':[],'BRAND':[],'COUNT':[],'PERCENTAGE':[]}
@@ -73,29 +62,29 @@ for state_link in state_list_1:
     
     for years in year_list_agg_users:
         year_wise_link = state_wise_link+years+'//'
-        files_list = os.listdir(year_wise_link)
+        files_list_uas = os.listdir(year_wise_link)
         
-        for files in files_list:
-            final_link = year_wise_link+files
+        for files in files_list_uas:
+            final_link_uas = year_wise_link+files
             
-            DATA_users = open(final_link,'r')
+            DATA_uas = open(final_link_uas,'r')
             
-            final_files = json.load(DATA_users)
+            final_files_uas = json.load(DATA_uas)
             
-            for files_ in final_files['data']:
+            for files_uas in final_files_uas['data']:
                 
                 
-                if final_files['data']['usersByDevice'] == None:
-                    users_ = final_files['data']['aggregated']['registeredUsers']
-                    app_opens = final_files['data']['aggregated']['appOpens']
+                if final_files_uas['data']['usersByDevice'] == None:
+                    users_ = final_files_uas['data']['aggregated']['registeredUsers']
+                    app_opens = final_files_uas['data']['aggregated']['appOpens']
                     brand_ = "-"
                     count_ = "-"
                     percentage_ = "-"
                 else:
-                    users_by_device = final_files['data']['usersByDevice']
+                    users_by_device = final_files_uas['data']['usersByDevice']
                     for users_data in users_by_device:
-                        users_ = final_files['data']['aggregated']['registeredUsers']
-                        app_opens = final_files['data']['aggregated']['appOpens']
+                        users_ = final_files_uas['data']['aggregated']['registeredUsers']
+                        app_opens = final_files_uas['data']['aggregated']['appOpens']
                         brand_ = users_data['brand']
                         count_ = users_data['count']
                         percentage_ = users_data['percentage']
@@ -110,10 +99,6 @@ for state_link in state_list_1:
                         users_agg_statewise['YEAR'].append(years)
                         users_agg_statewise['QUATER'].append(files.split('.json')[0])
 
-
-USERS_AGG_STATE_WISE = pd.DataFrame(users_agg_statewise)
-
-# write_pandas(my_connection,USERS_AGG_STATE_WISE,table_name = 'USERS_AGG_STATE_WISE')
 
 path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//map//transaction//hover//country//india//state//"
 
@@ -153,10 +138,6 @@ for states in state_list:
             
             
         
-
-MAP_TRANSACTION_LIST = pd.DataFrame(map_transaction_list)
-
-
 #map_users
 
 MAP_USERS_DATA = {'STATE':[],'YEAR':[],'QUATER':[],'DISTRICT':[],'REGISTERED_USERS':[],'APP_OPENS':[]}
@@ -193,11 +174,9 @@ for states in state_list:
                 MAP_USERS_DATA['REGISTERED_USERS'].append(registered_users)
                 MAP_USERS_DATA['APP_OPENS'].append(app_opens)
 
-MAP_USERS_DATA = pd.DataFrame(MAP_USERS_DATA)
-
 #top file _items
 
-TOP_TRANSACTION_LIST = {'STATE':[],'YEAR_':[],'QUATERS':[],'DISTRICT':[],'TYPE':[],'COUNT_':[],'AMOUNT':[]}
+TOP_TRANSACTION_LIST = {'STATE':[],'YEAR_':[],'QUATERS':[],'PINCODE':[],'COUNT_':[],'AMOUNT':[]}
 
 path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//top//transaction//country//india//state//"
 state_list = os.listdir(path)
@@ -219,27 +198,26 @@ for states in state_list:
             
             final_data = json.load(data)
             
-            state = states
-            year_ = years
-            quaters = files.split('.json')[0]
-            district_name = final_data['data']['districts'][0]['entityName']
-            type_ = final_data['data']['districts'][0]['metric']['type']
-            count_ = final_data['data']['districts'][0]['metric']['count']
-            amount = final_data['data']['districts'][0]['metric']['amount']
-            
-            TOP_TRANSACTION_LIST['STATE'].append(state)
-            TOP_TRANSACTION_LIST['YEAR_'].append(year_)
-            TOP_TRANSACTION_LIST['QUATERS'].append(quaters)
-            TOP_TRANSACTION_LIST['DISTRICT'].append(district_name)
-            TOP_TRANSACTION_LIST['TYPE'].append(type_)
-            TOP_TRANSACTION_LIST['COUNT_'].append(count_)
-            TOP_TRANSACTION_LIST['AMOUNT'].append(amount)
+            for top_trans_f in final_data['data']['pincodes']:
+                pincodes = top_trans_f['entityName']
+                counts = top_trans_f['metric']['count']
+                amount_ = top_trans_f['metric']['amount']
+                states_ = states
+                years_ = years
+                quaters_ = files.split('.json')[0]
+                
+                TOP_TRANSACTION_LIST['STATE'].append(states_)
+                TOP_TRANSACTION_LIST['YEAR_'].append(years_)
+                TOP_TRANSACTION_LIST['QUATERS'].append(quaters_)
+                TOP_TRANSACTION_LIST['PINCODE'].append(pincodes)
+                TOP_TRANSACTION_LIST['COUNT_'].append(counts)
+                TOP_TRANSACTION_LIST['AMOUNT'].append(amount)
 
-TOP_TRANSACTION_LIST = pd.DataFrame(TOP_TRANSACTION_LIST)
+
 
 #top users list
 
-TOP_USERS_LIST = {'STATE':[],'YEAR_':[],'QUATERS_':[],'DISTRICT':[],'REGISTERED_USERS':[]}
+TOP_USERS_LIST = {'STATE':[],'YEAR_':[],'QUATERS_':[],'PINCODE':[],'REGISTERED_USERS':[]}
 path = 'C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//top//user//country//india//state//'
 states = os.listdir(path)
 
@@ -260,16 +238,46 @@ for state in states:
             
             final_items  = json.load(DATA)
             
-            names = final_items['data']['districts'][0]['name']
-            registered_users = final_items['data']['districts'][0]['registeredUsers']
-            states = state 
-            years_ = years
-            quaters  = files.split('.json')[0]
-            
-            TOP_USERS_LIST['STATE'].append(states)
-            TOP_USERS_LIST['YEAR_'].append(years_)
-            TOP_USERS_LIST['QUATERS_'].append(quaters)
-            TOP_USERS_LIST['DISTRICT'].append(names)
-            TOP_USERS_LIST['REGISTERED_USERS'].append(registered_users)
+            for final_items_list in final_items['data']['pincodes']:
+                pincodes = final_items['data']['pincodes'][0]['name']
+                reg_users = final_items['data']['pincodes'][0]['registeredUsers']
+                states = state 
+                years_ = years
+                quaters  = files.split('.json')[0]
 
+                TOP_USERS_LIST['STATE'].append(states)
+                TOP_USERS_LIST['YEAR_'].append(years_)
+                TOP_USERS_LIST['QUATERS_'].append(quaters)
+                TOP_USERS_LIST['PINCODE'].append(pincodes)
+                TOP_USERS_LIST['REGISTERED_USERS'].append(reg_users)
+
+                
+# TRANSACTION_AGG_CITY_DATA = pd.DataFrame(agg_city_data)
+# USERS_AGG_STATE_WISE = pd.DataFrame(users_agg_statewise).drop_duplicates()
+# MAP_TRANSACTION_DATA = pd.DataFrame(map_transaction_list).drop_duplicates()
+# MAP_USERS_DATA = pd.DataFrame(MAP_USERS_DATA).drop_duplicates()
+# TOP_TRANSACTION_LIST = pd.DataFrame(TOP_TRANSACTION_LIST)
+# TOP_USERS_LIST = pd.DataFrame(TOP_USERS_LIST)
+# explore-->payments-->
+TRANSACTION_AGG_CITY_DATA = pd.DataFrame(agg_city_data)
+USERS_AGG_STATE_WISE = pd.DataFrame(users_agg_statewise)
+MAP_TRANSACTION_DATA = pd.DataFrame(map_transaction_list)
+MAP_USERS_DATA = pd.DataFrame(MAP_USERS_DATA)
+TOP_TRANSACTION_LIST = pd.DataFrame(TOP_TRANSACTION_LIST)
 TOP_USERS_LIST = pd.DataFrame(TOP_USERS_LIST)
+
+
+TRANSACTION_AGG_CITY_DATA['STATE'] = TRANSACTION_AGG_CITY_DATA['STATE'].str.replace("-"," ")
+TRANSACTION_AGG_CITY_DATA['STATE'] = TRANSACTION_AGG_CITY_DATA['STATE'].str.replace("&","and")
+TRANSACTION_AGG_CITY_DATA['NAME'] = TRANSACTION_AGG_CITY_DATA['NAME'].str.replace('&','and')
+TRANSACTION_AGG_CITY_DATA['NAME'] = TRANSACTION_AGG_CITY_DATA['NAME'].str.replace("-"," ")
+USERS_AGG_STATE_WISE['STATE'] = USERS_AGG_STATE_WISE['STATE'].str.replace("-"," ")
+USERS_AGG_STATE_WISE['STATE'] = USERS_AGG_STATE_WISE['STATE'].str.replace("&","and")
+MAP_TRANSACTION_DATA['STATE'] = MAP_TRANSACTION_DATA['STATE'].str.replace('-',' ')
+MAP_TRANSACTION_DATA['STATE'] = MAP_TRANSACTION_DATA['STATE'].str.replace('&','and')
+TOP_TRANSACTION_LIST['STATE'] = TOP_TRANSACTION_LIST['STATE'].str.replace('-',' ')
+TOP_TRANSACTION_LIST['STATE'] = TOP_TRANSACTION_LIST['STATE'].str.replace('&','and')
+TOP_USERS_LIST['STATE'] = TOP_USERS_LIST['STATE'].str.replace('-',' ')
+TOP_USERS_LIST['STATE'] = TOP_USERS_LIST['STATE'].str.replace('&','and')
+
+print(TOP_USERS_LIST)
