@@ -12,7 +12,7 @@
                 "schema": "PUBLIC",
                 "role": "ACCOUNTADMIN"
             },
-            "previewLimit": 50,
+            "previewLimit": 500,
             "driver": "Snowflake",
             "name": "Snowflake",
             "account": "eqcptkk-vw73578",
