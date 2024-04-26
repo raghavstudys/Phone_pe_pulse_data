@@ -3,9 +3,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 import json
-import snowflake.connector 
-from snowflake.connector.pandas_tools import write_pandas
-from snowflake.connector import connect,DictCursor
+import psycopg2
+import streamlit as st
 
 # my_connection = snowflake.connector.connect(user = 'SHANTH',
 #                                            password = 'Shashi@007',
@@ -285,3 +284,16 @@ TOP_USERS_LIST['STATE'] = TOP_USERS_LIST['STATE'].str.capitalize()
 TOP_USERS_LIST['STATE'] = TOP_USERS_LIST['STATE'].str.replace('&','and')
 
 print(TOP_USERS_LIST)
+
+def aggregated_view():
+    query = """select state,sum(cast (registeredusers as int)) as total_users from users_agg_state_wise group by 1 order by 2 desc;"""
+    my_connection = psycopg2.connect(host='localhost',
+                                user = 'postgres',
+                                port = "5432",
+                                database = 'phonepepulse',
+                                password = "Shashi@007")
+    curr = my_connection.cursor()
+    curr.execute(query)
+    data_1 = curr.fetchall()
+    final_data_visual = pd.DataFrame(data_1,columns = [i[0] for i in curr.description])
+    st.dataframe(final_data_visual) 
