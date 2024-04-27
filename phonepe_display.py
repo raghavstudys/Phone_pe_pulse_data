@@ -83,7 +83,7 @@ def aggregated_view():
     for value_h_1 in list(result_1[:1:1]['state'].values):
         for t_value_h_1 in list(result_1[:1:1]['transactions'].values):
             st.markdown(f'<p style="color:white;">Summary💡:</p> <p style="color:green;"> 👉 In year {selected_year_1} {value_h_1} had highest Transaction </p>', unsafe_allow_html=True)
-    st.metric(label="USERS",value=f'{round(max(transaction_amount_year['transactions'])/10000000,2)} Cr',delta=f'{round(np.mean(transaction_amount_year['transactions'])/10000000,2)} Cr')
+    st.metric(label="USERS", value=f"{round(max(transaction_amount_year.loc[:, 'transactions'])/10000000,2)} Cr", delta=f"{round(np.mean(transaction_amount_year.loc[:, 'transactions'])/10000000,2)} Cr")
     fig_1 = px.line(transaction_amount_year, x='state', y='transactions',color='year')
     st.plotly_chart(fig_1, use_container_width=True)
     
