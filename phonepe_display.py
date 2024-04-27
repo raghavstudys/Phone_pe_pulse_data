@@ -16,10 +16,9 @@ styles = {
     "nav": {"background-color": "#320d3e"},
     "nav-item": {"color": "#FFF"},
     "nav-link": {"color": "#FFF"},
-    "nav-link-selected": {"background-color": "#e3b448"},
+    "nav-link-selected": {"background-color": "#034569"},
 }
 st.set_page_config(layout="wide")
-
 
 with st.sidebar:
     select = option_menu("Main Menu", ['HOME-PAGE 🏠', "VISUALIZE 📈", "EXPLORE-DATA 🔎","ABOUT 📝"], orientation="Vertical", styles=styles)
@@ -89,12 +88,30 @@ def aggregated_view():
     st.plotly_chart(fig_1, use_container_width=True)
     
     
-
+def explore_func():
+    sql_code = st.text_area("Write your SQL code here:", value="SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ", height=200)
+    st.code(sql_code, language="python", line_numbers=False) 
+    query_for_sql = sql_code
+    my_connection = psycopg2.connect(host='localhost',
+                                user = 'postgres',
+                                port = "5432",
+                                database = 'phonepepulse',
+                                password = "Shashi@007")
+    curr = my_connection.cursor()
+    curr.execute(query_for_sql)
+    data_for_sql = curr.fetchall()
+    query_answer = pd.DataFrame(data_for_sql,columns = [i[0] for i in curr.description])
+    st.dataframe(query_answer)
 
 #Main_BUTTON IS VISULAIZE
-if select == "VISUALIZE 📈":
-    tab1,tab2,tab3 = st.tabs(['Aggregated View','Map View','Top View'])
-    
-    with tab1:
-        st.write('Displaying','Aggregated', 'View...')
-        aggregated_view()
+if __name__ == '__main__':
+    if select == "VISUALIZE 📈":
+        tab1,tab2,tab3 = st.tabs(['Aggregated View','Map View','Top View'])
+        
+        with tab1:
+            st.write('Displaying','Aggregated', 'View...')
+            aggregated_view()
+
+    elif select == "EXPLORE-DATA 🔎":
+        explore_func()
+
