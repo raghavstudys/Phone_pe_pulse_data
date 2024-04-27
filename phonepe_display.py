@@ -61,7 +61,7 @@ def aggregated_view():
     # Filter the data for the selected year
     chart_data_year = chart_data[chart_data['year'] == int(selected_year)].reset_index()
     
-    st.metric(label="USERS",value=f'{round(max(chart_data_year['total_users'])/10000000,2)} Cr',delta=f'{round(np.mean(chart_data_year['total_users'])/10000000,2)} Cr')
+    st.metric(label="USERS", value=f"{round(max(chart_data_year.loc[:, 'total_users'])/10000000,2)} Cr", delta=f"{round(np.mean(chart_data_year.loc[:, 'total_users'])/10000000,2)} Cr")
     fig = px.bar(chart_data_year, x='state', y='total_users', color='year', barmode='group')
     st.plotly_chart(fig, use_container_width=True)
     data_expander = st.expander('Show Data 🔦', expanded=False)
