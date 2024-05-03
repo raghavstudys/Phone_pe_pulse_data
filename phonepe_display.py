@@ -164,7 +164,7 @@ def home_page():
 
     rating = {'Name':[],'Stars':[]}
     Name = st.text_input("Enter Your Name:")
-    stars = st_star_rating("Please rate your experience", maxValue=5, defaultValue=0, key="rating")
+    stars = st_star_rating("Please rate your experience", maxValue=5, defaultValue=0, key="rating",dark_theme=True)
 
     # Check if a rating has been given
     if stars > 0:
