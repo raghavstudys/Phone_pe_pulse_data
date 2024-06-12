@@ -17,7 +17,7 @@ cursor = my_connection.cursor()
 #aggregated_Insurance
 
 
-path7 = "/Users/shanthakumark/Desk  top/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/aggregated/transaction/country/india/state/"
+path7 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/aggregated/transaction/country/india/state/"
 agg_insur_list = os.listdir(path7)
 
 columns7 = {"States": [], "Years": [], "Quarter": [], "Insurance_type": [], "Insurance_count": [], "Insurance_amount": []}
