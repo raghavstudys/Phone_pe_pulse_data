@@ -6,294 +6,615 @@ import json
 import psycopg2
 import streamlit as st
 
-# my_connection = snowflake.connector.connect(user = 'SHANTH',
-#                                            password = 'Shashi@007',
-#                                            account = 'ad38571.central-india.azure',
-#                                            warehouse = 'COMPUTE_WH',
-#                                            database = 'PHONEPE_PULSE',
-#                                            schema = 'PUBLIC',
-#                                            role = 'ACCOUNTADMIN')
 
-
-#agg_transaction_india_state_wise
-#First dataset iteration
-path ="C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//aggregated//transaction//country//india//state//"
-#iterate through path for file names
-city_agg_list = os.listdir(path)
-
-agg_city_data = {'STATE':[], 'YEAR':[],'QUATER':[],'NAME':[], 'COUNT':[], 'AMOUNT':[]}
-for i in city_agg_list:
-    city_link = path+i+'//'
-    year_agg_list_1 = os.listdir(city_link)
-    for j in year_agg_list_1:
-        file_year_list_1 = city_link+j+'//'
-#         for k in file_year_list:
-        json_agg_list_users = os.listdir(file_year_list_1)
-        for l in json_agg_list_users:
-            final = file_year_list_1+l
-            data = open(final,'r')
-
-            file_opener = json.load(data)
-
-            for list_ in file_opener['data']['transactionData']:
-                
-                name_ = list_['name']
-                count_ = list_['paymentInstruments'][0]['count']
-                amount_ = list_['paymentInstruments'][0]['amount']
-                agg_city_data['COUNT'].append(count_)
-                agg_city_data['AMOUNT'].append(amount_)
-                agg_city_data['NAME'].append(name_)
-                agg_city_data['STATE'].append(i)
-                agg_city_data['YEAR'].append(j)
-                agg_city_data['QUATER'].append(l.split('.')[0])
-
-
-#Extracting users_agg_statewise 
-users_agg_statewise = {'STATE':[], 'YEAR':[],'QUATER':[],'REGISTEREDUSERS':[],'APPOPENS':[],'BRAND':[],'COUNT':[],'PERCENTAGE':[]}
-
-path = '''C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//aggregated//user//country//india//state//'''
-state_list_1 = os.listdir(path)
-for state_link in state_list_1:
-    state_wise_link = path+state_link+'//'
-    
-    
-    year_list_agg_users = os.listdir(state_wise_link)
-    
-    for years in year_list_agg_users:
-        year_wise_link = state_wise_link+years+'//'
-        files_list_uas = os.listdir(year_wise_link)
-        
-        for files in files_list_uas:
-            final_link_uas = year_wise_link+files
-            
-            DATA_uas = open(final_link_uas,'r')
-            
-            final_files_uas = json.load(DATA_uas)
-            
-            for files_uas in final_files_uas['data']:
-                
-                
-                if final_files_uas['data']['usersByDevice'] == None:
-                    users_ = final_files_uas['data']['aggregated']['registeredUsers']
-                    app_opens = final_files_uas['data']['aggregated']['appOpens']
-                    brand_ = "-"
-                    count_ = "-"
-                    percentage_ = "-"
-                else:
-                    users_by_device = final_files_uas['data']['usersByDevice']
-                    for users_data in users_by_device:
-                        users_ = final_files_uas['data']['aggregated']['registeredUsers']
-                        app_opens = final_files_uas['data']['aggregated']['appOpens']
-                        brand_ = users_data['brand']
-                        count_ = users_data['count']
-                        percentage_ = users_data['percentage']
-                        
-
-                        users_agg_statewise['REGISTEREDUSERS'].append(users_)
-                        users_agg_statewise['APPOPENS'].append(app_opens)
-                        users_agg_statewise['BRAND'].append(brand_)
-                        users_agg_statewise['COUNT'].append(count_)
-                        users_agg_statewise['PERCENTAGE'].append(percentage_)
-                        users_agg_statewise['STATE'].append(state_link)
-                        users_agg_statewise['YEAR'].append(years)
-                        users_agg_statewise['QUATER'].append(files.split('.json')[0])
-
-
-path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//map//transaction//hover//country//india//state//"
-
-map_transaction_list = {'STATE':[],'YEAR':[],"QUATER":[],"DIST_NAME":[],"TYPE":[],"COUNT":[],"AMOUNT":[]}
-
-state_list = os.listdir(path)
-for states in state_list:
-    W_states_path = path+states+"//"
-    
-    years_list = os.listdir(W_states_path)
-    for years in years_list:
-        W_year_path = W_states_path+years+"//"
-        
-        files_list = os.listdir(W_year_path)
-        for files in files_list:
-            final_path_1 = W_year_path+files
-            
-            DATA_3 = open(final_path_1,'r')
-            final_files_3 = json.load(DATA_3)
-            
-            for file_items in final_files_3['data']['hoverDataList']:
-                s_names = file_items['name']
-                types = file_items['metric'][0]['type']
-                count = file_items['metric'][0]['count']
-                amount = file_items['metric'][0]['amount']
-                states = states
-                years_ = years
-                quaters = files.split('.json')[0]
-                
-                map_transaction_list['STATE'].append(states)
-                map_transaction_list['YEAR'].append(years_)
-                map_transaction_list['QUATER'].append(quaters)
-                map_transaction_list['DIST_NAME'].append(s_names)
-                map_transaction_list['TYPE'].append(types)
-                map_transaction_list['COUNT'].append(count)
-                map_transaction_list['AMOUNT'].append(amount)
-            
-            
-        
-#map_users
-
-MAP_USERS_DATA = {'STATE':[],'YEAR':[],'QUATER':[],'DISTRICT':[],'REGISTERED_USERS':[],'APP_OPENS':[]}
-
-path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//map//user//hover//country//india//state//"
-
-state_list = os.listdir(path)
-
-for states in state_list:
-    w_state_path = path+states+"//"
-    year_list = os.listdir(w_state_path)
-    
-    for years in year_list:
-        w_year_path = w_state_path+years+"//"
-        
-        files_list = os.listdir(w_year_path)
-        
-        for files in files_list:
-            w_files_path = w_year_path+files
-            
-            data = open(w_files_path,'r')
-            
-            final_files = json.load(data)
-            
-            for district in final_files['data']['hoverData']:
-                districts = district
-                registered_users = final_files['data']['hoverData'][district]['registeredUsers']
-                app_opens = final_files['data']['hoverData'][district]['appOpens']
-
-                MAP_USERS_DATA['STATE'].append(states)
-                MAP_USERS_DATA['YEAR'].append(years)
-                MAP_USERS_DATA['QUATER'].append(files.split('.json')[0])
-                MAP_USERS_DATA['DISTRICT'].append(districts)
-                MAP_USERS_DATA['REGISTERED_USERS'].append(registered_users)
-                MAP_USERS_DATA['APP_OPENS'].append(app_opens)
-
-#top file _items
-
-TOP_TRANSACTION_LIST = {'STATE':[],'YEAR_':[],'QUATERS':[],'PINCODE':[],'COUNT_':[],'AMOUNT':[]}
-
-path = "C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//top//transaction//country//india//state//"
-state_list = os.listdir(path)
-
-for states in state_list:
-    w_state_path = path+states+"//"
-    
-    year_list = os.listdir(w_state_path)
-    
-    for years in year_list:
-        w_year_path = w_state_path+years+"//"
-        
-        files_list = os.listdir(w_year_path)
-        
-        for files in files_list:
-            w_files_path = w_year_path+files
-            
-            data = open(w_files_path,'r')
-            
-            final_data = json.load(data)
-            
-            for top_trans_f in final_data['data']['pincodes']:
-                pincodes = top_trans_f['entityName']
-                counts = top_trans_f['metric']['count']
-                amount_ = top_trans_f['metric']['amount']
-                states_ = states
-                years_ = years
-                quaters_ = files.split('.json')[0]
-                
-                TOP_TRANSACTION_LIST['STATE'].append(states_)
-                TOP_TRANSACTION_LIST['YEAR_'].append(years_)
-                TOP_TRANSACTION_LIST['QUATERS'].append(quaters_)
-                TOP_TRANSACTION_LIST['PINCODE'].append(pincodes)
-                TOP_TRANSACTION_LIST['COUNT_'].append(counts)
-                TOP_TRANSACTION_LIST['AMOUNT'].append(amount)
-
-
-
-#top users list
-
-TOP_USERS_LIST = {'STATE':[],'YEAR_':[],'QUATERS_':[],'PINCODE':[],'REGISTERED_USERS':[]}
-path = 'C://Users//Shanth//OneDrive//Desktop//GUVI - Python//Datasets//git//pulse//data//top//user//country//india//state//'
-states = os.listdir(path)
-
-for state in states:
-    w_state_path = path+state+"//"
-    
-    year_list = os.listdir(w_state_path)
-    
-    for years in year_list:
-        w_year_path = w_state_path+years+"//"
-        
-        files_list = os.listdir(w_year_path)
-        
-        for files in files_list:
-            final_path = w_year_path+files
-            
-            DATA = open(final_path,'r')
-            
-            final_items  = json.load(DATA)
-            
-            for final_items_list in final_items['data']['pincodes']:
-                pincodes = final_items['data']['pincodes'][0]['name']
-                reg_users = final_items['data']['pincodes'][0]['registeredUsers']
-                states = state 
-                years_ = years
-                quaters  = files.split('.json')[0]
-
-                TOP_USERS_LIST['STATE'].append(states)
-                TOP_USERS_LIST['YEAR_'].append(years_)
-                TOP_USERS_LIST['QUATERS_'].append(quaters)
-                TOP_USERS_LIST['PINCODE'].append(pincodes)
-                TOP_USERS_LIST['REGISTERED_USERS'].append(reg_users)
-
-                
-# TRANSACTION_AGG_CITY_DATA = pd.DataFrame(agg_city_data)
-# USERS_AGG_STATE_WISE = pd.DataFrame(users_agg_statewise).drop_duplicates()
-# MAP_TRANSACTION_DATA = pd.DataFrame(map_transaction_list).drop_duplicates()
-# MAP_USERS_DATA = pd.DataFrame(MAP_USERS_DATA).drop_duplicates()
-# TOP_TRANSACTION_LIST = pd.DataFrame(TOP_TRANSACTION_LIST)
-# TOP_USERS_LIST = pd.DataFrame(TOP_USERS_LIST)
-# explore-->payments-->
-TRANSACTION_AGG_CITY_DATA = pd.DataFrame(agg_city_data)
-USERS_AGG_STATE_WISE = pd.DataFrame(users_agg_statewise)
-MAP_TRANSACTION_DATA = pd.DataFrame(map_transaction_list)
-MAP_USERS_DATA = pd.DataFrame(MAP_USERS_DATA)
-TOP_TRANSACTION_LIST = pd.DataFrame(TOP_TRANSACTION_LIST)
-TOP_USERS_LIST = pd.DataFrame(TOP_USERS_LIST)
-
-TRANSACTION_AGG_CITY_DATA['STATE'] = TRANSACTION_AGG_CITY_DATA['STATE'].str.replace("-"," ")
-TRANSACTION_AGG_CITY_DATA['STATE'] = TRANSACTION_AGG_CITY_DATA['STATE'].str.capitalize()
-TRANSACTION_AGG_CITY_DATA['STATE'] = TRANSACTION_AGG_CITY_DATA['STATE'].str.replace("&","and")
-TRANSACTION_AGG_CITY_DATA['NAME'] = TRANSACTION_AGG_CITY_DATA['NAME'].str.replace('&','and')
-TRANSACTION_AGG_CITY_DATA['NAME'] = TRANSACTION_AGG_CITY_DATA['NAME'].str.replace("-"," ")
-USERS_AGG_STATE_WISE['STATE'] = USERS_AGG_STATE_WISE['STATE'].str.replace("-"," ")
-USERS_AGG_STATE_WISE['STATE'] = USERS_AGG_STATE_WISE['STATE'].str.capitalize()
-USERS_AGG_STATE_WISE['STATE'] = USERS_AGG_STATE_WISE['STATE'].str.replace("&","and")
-MAP_TRANSACTION_DATA['STATE'] = MAP_TRANSACTION_DATA['STATE'].str.replace('-',' ')
-MAP_TRANSACTION_DATA['STATE'] = MAP_TRANSACTION_DATA['STATE'].str.capitalize()
-MAP_TRANSACTION_DATA['STATE'] = MAP_TRANSACTION_DATA['STATE'].str.replace('&','and')
-TOP_TRANSACTION_LIST['STATE'] = TOP_TRANSACTION_LIST['STATE'].str.replace('-',' ')
-TOP_TRANSACTION_LIST['STATE'] = TOP_TRANSACTION_LIST['STATE'].str.capitalize()
-TOP_TRANSACTION_LIST['STATE'] = TOP_TRANSACTION_LIST['STATE'].str.replace('&','and')
-TOP_USERS_LIST['STATE'] = TOP_USERS_LIST['STATE'].str.replace('-',' ')
-TOP_USERS_LIST['STATE'] = TOP_USERS_LIST['STATE'].str.capitalize()
-TOP_USERS_LIST['STATE'] = TOP_USERS_LIST['STATE'].str.replace('&','and')
-
-print(TOP_USERS_LIST)
-
-def aggregated_view():
-    query = """select state,sum(cast (registeredusers as int)) as total_users from users_agg_state_wise group by 1 order by 2 desc;"""
-    my_connection = psycopg2.connect(host='localhost',
+my_connection = psycopg2.connect(host='localhost',
                                 user = 'postgres',
                                 port = "5432",
-                                database = 'phonepepulse',
+                                database = 'PhonepePulse',
                                 password = "Shashi@007")
-    curr = my_connection.cursor()
-    curr.execute(query)
-    data_1 = curr.fetchall()
-    final_data_visual = pd.DataFrame(data_1,columns = [i[0] for i in curr.description])
-    st.dataframe(final_data_visual) 
+cursor = my_connection.cursor()
+
+#aggregated_Insurance
+
+
+path7 = "/Users/shanthakumark/Desk  top/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/aggregated/transaction/country/india/state/"
+agg_insur_list = os.listdir(path7)
+
+columns7 = {"States": [], "Years": [], "Quarter": [], "Insurance_type": [], "Insurance_count": [], "Insurance_amount": []}
+
+for state in agg_insur_list:
+    cur_states = os.path.join(path7, state)
+    if os.path.isdir(cur_states):  # Check if it's a directory
+        agg_year_list = os.listdir(cur_states)
+
+        for year in agg_year_list:
+            cur_years = os.path.join(cur_states, year)
+            if os.path.isdir(cur_years):  # Check if it's a directory
+                agg_file_list = os.listdir(cur_years)
+
+                for file in agg_file_list:
+                    cur_files = os.path.join(cur_years, file)
+                    if file.endswith('.json') and os.path.isfile(cur_files):  # Check if it's a JSON file
+                        with open(cur_files, "r") as data_file:
+                            A = json.load(data_file)
+
+                        for i in A["data"]["transactionData"]:
+                            name = i["name"]
+                            count = i["paymentInstruments"][0]["count"]
+                            amount = i["paymentInstruments"][0]["amount"]
+                            columns7["Insurance_type"].append(name)
+                            columns7["Insurance_count"].append(count)
+                            columns7["Insurance_amount"].append(amount)
+                            columns7["States"].append(state)
+                            columns7["Years"].append(year)
+                            columns7["Quarter"].append(int(file.strip(".json")))
+
+aggre_insurance = pd.DataFrame(columns7)
+
+# Clean up state names
+aggre_insurance["States"] = aggre_insurance["States"].str.replace("andaman-&-nicobar-islands", "Andaman & Nicobar")
+aggre_insurance["States"] = aggre_insurance["States"].str.replace("-", " ")
+aggre_insurance["States"] = aggre_insurance["States"].str.title()
+aggre_insurance['States'] = aggre_insurance['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+
+#aggregated insurance table
+create_query7= '''CREATE TABLE if not exists aggregated_insurance (States varchar(50),
+                                                                      Years int,
+                                                                      Quarter int,
+                                                                      Insurance_type varchar(50),
+                                                                      Insurance_count bigint,
+                                                                      Insurance_amount float
+                                                                      )'''
+cursor.execute(create_query7)
+my_connection.commit()
+
+# PUSHING INTO POSTGRESQL AGGREGATED_INSURANCE
+# for index,row in aggre_insurance.iterrows():
+#     insert_query7 = '''INSERT INTO aggregated_insurance (States, Years, Quarter, Insurance_type, Insurance_count, Insurance_amount)
+#                                                         values(%s,%s,%s,%s,%s,%s)'''
+#     values = (row["States"],
+#               row["Years"],
+#               row["Quarter"],
+#               row["Insurance_type"],
+#               row["Insurance_count"],
+#               row["Insurance_amount"]
+#               )
+#     cursor.execute(insert_query7,values)
+#     my_connection.commit()
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Aggregated_Transaction
+
+path1 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/aggregated/transaction/country/india/state/"
+         
+agg_tran_list = os.listdir(path1)
+
+columns1 ={"States":[], "Years":[], "Quarter":[], "Transaction_type":[], "Transaction_count":[],"Transaction_amount":[] }
+
+for state in agg_tran_list:
+    cur_states = os.path.join(path1,state)
+    if os.path.isdir(cur_states):
+        agg_year_list = os.listdir(cur_states)
+        
+        for year in agg_year_list:
+            cur_years = os.path.join(cur_states,year)
+            if os.path.isdir(cur_years):
+                agg_file_list = os.listdir(cur_years)
+
+                for file in agg_file_list:
+                    cur_files = os.path.join(cur_years,file)
+                    data = open(cur_files,"r")
+                    B = json.load(data)
+
+                    for i in B["data"]["transactionData"]:
+                        name = i["name"]
+                        count = i["paymentInstruments"][0]["count"]
+                        amount = i["paymentInstruments"][0]["amount"]
+                        columns1["Transaction_type"].append(name)
+                        columns1["Transaction_count"].append(count)
+                        columns1["Transaction_amount"].append(amount)
+                        columns1["States"].append(state)
+                        columns1["Years"].append(year)
+                        columns1["Quarter"].append(int(file.strip(".json")))
+
+aggre_transaction = pd.DataFrame(columns1)
+
+aggre_transaction["States"] = aggre_transaction["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+aggre_transaction["States"] = aggre_transaction["States"].str.replace("-"," ")
+aggre_transaction["States"] = aggre_transaction["States"].str.title()
+aggre_transaction['States'] = aggre_transaction['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+
+#aggregated transaction table
+create_query1 = '''CREATE TABLE if not exists aggregated_transaction (States varchar(50),
+                                                                      Years int,
+                                                                      Quarter int,
+                                                                      Transaction_type varchar(50),
+                                                                      Transaction_count bigint,
+                                                                      Transaction_amount float
+                                                                      )'''
+cursor.execute(create_query1)
+my_connection.commit()
+
+#PUSHING AGGREGATED_TRANSACTION
+
+# for index,row in aggre_transaction.iterrows():
+#     insert_query1 = '''INSERT INTO aggregated_transaction (States, Years, Quarter, Transaction_type, Transaction_count, Transaction_amount)
+#                                                         values(%s,%s,%s,%s,%s,%s)'''
+#     values = (row["States"],
+#               row["Years"],
+#               row["Quarter"],
+#               row["Transaction_type"],
+#               row["Transaction_count"],
+#               row["Transaction_amount"]
+#               )
+#     cursor.execute(insert_query1,values)
+#     my_connection.commit()
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+
+#aggre_user
+path2 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/aggregated/user/country/india/state/"
+         
+agg_user_list = os.listdir(path2)
+
+columns2 = {"States":[], "Years":[], "Quarter":[], "Brands":[],"Transaction_count":[], "Percentage":[]}
+
+for state in agg_user_list:
+    cur_states = os.path.join(path2,state)
+    if os.path.isdir(cur_states):
+        agg_year_list = os.listdir(cur_states)
+    
+        for year in agg_year_list:
+            cur_years = os.path.join(cur_states,year)
+            if os.path.isdir(cur_years):
+                agg_file_list = os.listdir(cur_years)
+            
+                for file in agg_file_list:
+                    cur_files = os.path.join(cur_years,file)
+                    data = open(cur_files,"r")
+                    C = json.load(data)
+
+                    try:
+
+                        for i in C["data"]["usersByDevice"]:
+                            brand = i["brand"]
+                            count = i["count"]
+                            percentage = i["percentage"]
+                            columns2["Brands"].append(brand)
+                            columns2["Transaction_count"].append(count)
+                            columns2["Percentage"].append(percentage)
+                            columns2["States"].append(state)
+                            columns2["Years"].append(year)
+                            columns2["Quarter"].append(int(file.strip(".json")))
+            
+                    except:
+                        pass
+
+aggre_user = pd.DataFrame(columns2)
+
+
+# Convert the 'States' column to string if it's not already
+aggre_user["States"] = aggre_user["States"].astype(str)
+
+# Now you can safely use the .str accessor
+aggre_user["States"] = aggre_user["States"].str.replace("andaman-&-nicobar-islands", "Andaman & Nicobar")
+aggre_user["States"] = aggre_user["States"].str.replace("-", " ")
+aggre_user["States"] = aggre_user["States"].str.title()
+aggre_user['States'] = aggre_user['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+aggre_user["States"] = aggre_user["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+aggre_user["States"] = aggre_user["States"].str.replace("-"," ")
+aggre_user["States"] = aggre_user["States"].str.title()
+aggre_user['States'] = aggre_user['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+
+
+
+
+# aggregated user table
+create_query2 = '''CREATE TABLE if not exists aggregated_user (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                Brands varchar(50),
+                                                                Transaction_count bigint,
+                                                                Percentage float)'''
+cursor.execute(create_query2)
+my_connection.commit()
+
+# for index,row in aggre_user.iterrows():
+#     insert_query2 = '''INSERT INTO aggregated_user (States, Years, Quarter, Brands, Transaction_count, Percentage)
+#                                                     values(%s,%s,%s,%s,%s,%s)'''
+#     values = (row["States"],
+#               row["Years"],
+#               row["Quarter"],
+#               row["Brands"],
+#               row["Transaction_count"],
+#               row["Percentage"])
+#     cursor.execute(insert_query2,values)
+#     my_connection.commit()
+
+#--------------------------------------------------------------------------------------------------------------------------------
+
+#MAP INSURANCE
+
+path8= "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/map/insurance/hover/country/india/state/"
+
+map_insur_list= os.listdir(path8)
+
+columns8= {"States":[], "Years":[], "Quarter":[], "Districts":[], "Transaction_count":[],"Transaction_amount":[] }
+
+for state in map_insur_list:
+    cur_states =os.path.join(path8,state)
+    if os.path.isdir(cur_states):
+        agg_year_list = os.listdir(cur_states)
+    
+        for year in agg_year_list:
+            cur_years = os.path.join(cur_states,year)
+            if os.path.isdir(cur_years):
+                agg_file_list = os.listdir(cur_years)
+
+                for file in agg_file_list:
+                    cur_files = os.path.join(cur_years,file)
+                    data = open(cur_files,"r")
+                    D = json.load(data)
+
+                    for i in D["data"]["hoverDataList"]:
+                        name = i["name"]
+                        count = i["metric"][0]["count"]
+                        amount = i["metric"][0]["amount"]
+                        columns8["Districts"].append(name)
+                        columns8["Transaction_count"].append(count)
+                        columns8["Transaction_amount"].append(amount)
+                        columns8["States"].append(state)
+                        columns8["Years"].append(year)
+                        columns8["Quarter"].append(int(file.strip(".json")))
+
+
+map_insurance = pd.DataFrame(columns8)
+
+map_insurance["States"] = map_insurance["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+map_insurance["States"] = map_insurance["States"].str.replace("-"," ")
+map_insurance["States"] = map_insurance["States"].str.title()
+map_insurance['States'] = map_insurance['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+
+#map_insurance_table
+create_query8 = '''CREATE TABLE if not exists map_insurance (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                District varchar(50),
+                                                                Transaction_count bigint,
+                                                                Transaction_amount float)'''
+cursor.execute(create_query8)
+my_connection.commit()
+
+# for index,row in map_insurance.iterrows():
+#             insert_query8 = '''
+#                 INSERT INTO map_insurance (States, Years, Quarter, District, Transaction_count, Transaction_amount)
+#                 VALUES (%s, %s, %s, %s, %s, %s)
+
+#             '''
+#             values = (
+#                 row['States'],
+#                 row['Years'],
+#                 row['Quarter'],
+#                 row['Districts'],
+#                 row['Transaction_count'],
+#                 row['Transaction_amount']
+#             )
+#             cursor.execute(insert_query8,values)
+#             my_connection.commit() 
+
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+
+#map_transaction_table
+
+path3 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/map/transaction/hover/country/india/state/"
+map_tran_list = os.listdir(path3)
+
+columns3 = {"States":[], "Years":[], "Quarter":[],"District":[], "Transaction_count":[],"Transaction_amount":[]}
+
+for state in map_tran_list:
+    cur_states = path3+state+"/"
+    map_year_list = os.listdir(cur_states)
+    
+    for year in map_year_list:
+        cur_years = cur_states+year+"/"
+        map_file_list = os.listdir(cur_years)
+        
+        for file in map_file_list:
+            cur_files = cur_years+file
+            data = open(cur_files,"r")
+            E = json.load(data)
+
+            for i in E['data']["hoverDataList"]:
+                name = i["name"]
+                count = i["metric"][0]["count"]
+                amount = i["metric"][0]["amount"]
+                columns3["District"].append(name)
+                columns3["Transaction_count"].append(count)
+                columns3["Transaction_amount"].append(amount)
+                columns3["States"].append(state)
+                columns3["Years"].append(year)
+                columns3["Quarter"].append(int(file.strip(".json")))
+
+map_transaction = pd.DataFrame(columns3)
+
+map_transaction["States"] = map_transaction["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+map_transaction["States"] = map_transaction["States"].str.replace("-"," ")
+map_transaction["States"] = map_transaction["States"].str.title()
+map_transaction['States'] = map_transaction['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+
+create_query3 = '''CREATE TABLE if not exists map_transaction (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                District varchar(50),
+                                                                Transaction_count bigint,
+                                                                Transaction_amount float)'''
+cursor.execute(create_query3)
+my_connection.commit()
+
+# for index,row in map_transaction.iterrows():
+#             insert_query3 = '''
+#                 INSERT INTO map_Transaction (States, Years, Quarter, District, Transaction_count, Transaction_amount)
+#                 VALUES (%s, %s, %s, %s, %s, %s)
+
+#             '''
+#             values = (
+#                 row['States'],
+#                 row['Years'],
+#                 row['Quarter'],
+#                 row['District'],
+#                 row['Transaction_count'],
+#                 row['Transaction_amount']
+#             )
+#             cursor.execute(insert_query3,values)
+#             my_connection.commit() 
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+#map_user_table
+
+path4 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/map/user/hover/country/india/state/"
+map_user_list = os.listdir(path4)
+
+columns4 = {"States":[], "Years":[], "Quarter":[], "Districts":[], "RegisteredUser":[], "AppOpens":[]}
+
+for state in map_user_list:
+    cur_states = path4+state+"/"
+    map_year_list = os.listdir(cur_states)
+    
+    for year in map_year_list:
+        cur_years = cur_states+year+"/"
+        map_file_list = os.listdir(cur_years)
+        
+        for file in map_file_list:
+            cur_files = cur_years+file
+            data = open(cur_files,"r")
+            F = json.load(data)
+
+            for i in F["data"]["hoverData"].items():
+                district = i[0]
+                registereduser = i[1]["registeredUsers"]
+                appopens = i[1]["appOpens"]
+                columns4["Districts"].append(district)
+                columns4["RegisteredUser"].append(registereduser)
+                columns4["AppOpens"].append(appopens)
+                columns4["States"].append(state)
+                columns4["Years"].append(year)
+                columns4["Quarter"].append(int(file.strip(".json")))
+
+map_user = pd.DataFrame(columns4)
+
+map_user["States"] = map_user["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+map_user["States"] = map_user["States"].str.replace("-"," ")
+map_user["States"] = map_user["States"].str.title()
+map_user['States'] = map_user['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+create_query4 = '''CREATE TABLE if not exists map_user (States varchar(50),
+                                                        Years int,
+                                                        Quarter int,
+                                                        Districts varchar(50),
+                                                        RegisteredUser bigint,
+                                                        AppOpens bigint)'''
+cursor.execute(create_query4)
+my_connection.commit()
+
+# for index,row in map_user.iterrows():
+#     insert_query4 = '''INSERT INTO map_user (States, Years, Quarter, Districts, RegisteredUser, AppOpens)
+#                         values(%s,%s,%s,%s,%s,%s)'''
+#     values = (row["States"],
+#               row["Years"],
+#               row["Quarter"],
+#               row["Districts"],
+#               row["RegisteredUser"],
+#               row["AppOpens"])
+#     cursor.execute(insert_query4,values)
+#     my_connection.commit()
+
+#-------------------------------------------------------------------------------------------------------------------------------
+#top_insurance_table
+
+path9 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/top/insurance/country/india/state/"
+
+top_insur_list = os.listdir(path9)
+
+columns9 = {"States":[], "Years":[], "Quarter":[], "Pincodes":[], "Transaction_count":[], "Transaction_amount":[]}
+
+for state in top_insur_list:
+    cur_states = path9+state+"/"
+    top_year_list = os.listdir(cur_states)
+
+    for year in top_year_list:
+        cur_years = cur_states+year+"/"
+        top_file_list = os.listdir(cur_years)
+
+        for file in top_file_list:
+            cur_files = cur_years+file
+            data = open(cur_files,"r")
+            G = json.load(data)
+
+            for i in G["data"]["pincodes"]:
+                entityName = i["entityName"]
+                count = i["metric"]["count"]
+                amount = i["metric"]["amount"]
+                columns9["Pincodes"].append(entityName)
+                columns9["Transaction_count"].append(count)
+                columns9["Transaction_amount"].append(amount)
+                columns9["States"].append(state)
+                columns9["Years"].append(year)
+                columns9["Quarter"].append(int(file.strip(".json")))
+
+top_insur = pd.DataFrame(columns9)
+
+top_insur["States"] = top_insur["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+top_insur["States"] = top_insur["States"].str.replace("-"," ")
+top_insur["States"] = top_insur["States"].str.title()
+top_insur['States'] = top_insur['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+
+create_query9 = '''CREATE TABLE if not exists top_insurance (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                Pincodes int,
+                                                                Transaction_count bigint,
+                                                                Transaction_amount float)'''
+cursor.execute(create_query9)
+my_connection.commit()
+
+# for index,row in top_insur.iterrows():
+#     insert_query9 = '''INSERT INTO top_insurance (States, Years, Quarter, Pincodes, Transaction_count, Transaction_amount)
+#                                                     values(%s,%s,%s,%s,%s,%s)'''
+#     values = (row["States"],
+#               row["Years"],
+#               row["Quarter"],
+#               row["Pincodes"],
+#               row["Transaction_count"],
+#               row["Transaction_amount"])
+#     cursor.execute(insert_query9,values)
+#     my_connection.commit()
+
+#--------------------------------------------------------------------------------------------------------------------------------
+#top_transaction_table
+
+path5 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/top/transaction/country/india/state/"
+top_tran_list = os.listdir(path5)
+
+columns5 = {"States":[], "Years":[], "Quarter":[], "Pincodes":[], "Transaction_count":[], "Transaction_amount":[]}
+
+for state in top_tran_list:
+    cur_states = path5+state+"/"
+    top_year_list = os.listdir(cur_states)
+    
+    for year in top_year_list:
+        cur_years = cur_states+year+"/"
+        top_file_list = os.listdir(cur_years)
+        
+        for file in top_file_list:
+            cur_files = cur_years+file
+            data = open(cur_files,"r")
+            H = json.load(data)
+
+            for i in H["data"]["pincodes"]:
+                entityName = i["entityName"]
+                count = i["metric"]["count"]
+                amount = i["metric"]["amount"]
+                columns5["Pincodes"].append(entityName)
+                columns5["Transaction_count"].append(count)
+                columns5["Transaction_amount"].append(amount)
+                columns5["States"].append(state)
+                columns5["Years"].append(year)
+                columns5["Quarter"].append(int(file.strip(".json")))
+
+top_transaction = pd.DataFrame(columns5)
+
+top_transaction["States"] = top_transaction["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+top_transaction["States"] = top_transaction["States"].str.replace("-"," ")
+top_transaction["States"] = top_transaction["States"].str.title()
+top_transaction['States'] = top_transaction['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+
+create_query5 = '''CREATE TABLE if not exists top_transaction (States varchar(50),
+                                                                Years int,
+                                                                Quarter int,
+                                                                pincodes int,
+                                                                Transaction_count bigint,
+                                                                Transaction_amount float)'''
+cursor.execute(create_query5)
+my_connection.commit()
+
+# for index,row in top_transaction.iterrows():
+#     insert_query5 = '''INSERT INTO top_transaction (States, Years, Quarter, Pincodes, Transaction_count, Transaction_amount)
+#                                                     values(%s,%s,%s,%s,%s,%s)'''
+#     values = (row["States"],
+#               row["Years"],
+#               row["Quarter"],
+#               row["Pincodes"],
+#               row["Transaction_count"],
+#               row["Transaction_amount"])
+#     cursor.execute(insert_query5,values)
+#     my_connection.commit()
+
+#--------------------------------------------------------------------------------------------------------------------------------
+
+#top_user_table
+
+path6 = "/Users/shanthakumark/Desktop/Sharing/Project_phone_pe_pulse/Datasets/pulse/data/top/user/country/india/state/"
+top_user_list = os.listdir(path6)
+
+columns6 = {"States":[], "Years":[], "Quarter":[], "Pincodes":[], "RegisteredUser":[]}
+
+for state in top_user_list:
+    cur_states = path6+state+"/"
+    top_year_list = os.listdir(cur_states)
+
+    for year in top_year_list:
+        cur_years = cur_states+year+"/"
+        top_file_list = os.listdir(cur_years)
+
+        for file in top_file_list:
+            cur_files = cur_years+file
+            data = open(cur_files,"r")
+            I = json.load(data)
+
+            for i in I["data"]["pincodes"]:
+                name = i["name"]
+                registeredusers = i["registeredUsers"]
+                columns6["Pincodes"].append(name)
+                columns6["RegisteredUser"].append(registereduser)
+                columns6["States"].append(state)
+                columns6["Years"].append(year)
+                columns6["Quarter"].append(int(file.strip(".json")))
+
+top_user = pd.DataFrame(columns6)
+
+top_user["States"] = top_user["States"].str.replace("andaman-&-nicobar-islands","Andaman & Nicobar")
+top_user["States"] = top_user["States"].str.replace("-"," ")
+top_user["States"] = top_user["States"].str.title()
+top_user['States'] = top_user['States'].str.replace("Dadra & Nagar Haveli & Daman & Diu", "Dadra and Nagar Haveli and Daman and Diu")
+
+create_query6 = '''CREATE TABLE if not exists top_user (States varchar(50),
+                                                        Years int,
+                                                        Quarter int,
+                                                        Pincodes int,
+                                                        RegisteredUser bigint
+                                                        )'''
+cursor.execute(create_query6)
+my_connection.commit()
+
+for index,row in top_user.iterrows():
+    insert_query6 = '''INSERT INTO top_user (States, Years, Quarter, Pincodes, RegisteredUser)
+                                            values(%s,%s,%s,%s,%s)'''
+    values = (row["States"],
+              row["Years"],
+              row["Quarter"],
+              row["Pincodes"],
+              row["RegisteredUser"])
+    cursor.execute(insert_query6,values)
+    my_connection.commit()
+
+
+
